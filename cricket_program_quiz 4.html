@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Cricket Program</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy:    #0D1B2A;
+    --navymid: #1A2E45;
+    --green:   #2ECC71;
+    --greendk: #27AE60;
+    --white:   #FFFFFF;
+    --silver:  #A8B8C8;
+    --amber:   #F39C12;
+    --red:     #E74C3C;
+
+    /* Program colours */
+    --junior-col:  #27AE60;
+    --inter-col:   #2980B9;
+    --adv-col:     #8E44AD;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Background grain texture ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(46,204,113,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(41,128,185,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Wrapper ── */
+  .quiz-wrap {
+    position: relative; z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Logo / Brand ── */
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 48px;
+  }
+  .brand-bar {
+    width: 4px; height: 36px;
+    background: var(--green);
+    border-radius: 2px;
+  }
+  .brand-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--green);
+    text-transform: uppercase;
+  }
+
+  /* ── Progress bar ── */
+  .progress-wrap {
+    margin-bottom: 36px;
+  }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-size: 11px; font-weight: 600;
+    color: var(--silver); letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .progress-track {
+    height: 3px;
+    background: var(--navymid);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ── Question card ── */
+  .question-card {
+    animation: slideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-num {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .question-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(24px, 5vw, 34px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--white);
+    margin-bottom: 32px;
+    letter-spacing: -0.3px;
+  }
+
+  /* ── Answer options ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 18px 20px;
+    background: var(--navymid);
+    border: 1px solid rgba(168,184,200,0.15);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .option::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 0.2s;
+  }
+  .option:hover {
+    border-color: rgba(46,204,113,0.4);
+    background: #1E3550;
+    transform: translateX(4px);
+  }
+  .option:hover::before { background: var(--green); }
+
+  .option.selected {
+    border-color: var(--green);
+    background: rgba(46,204,113,0.1);
+  }
+  .option.selected::before { background: var(--green); }
+
+  .option-letter {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700;
+    color: var(--silver);
+    transition: all 0.2s;
+  }
+  .option.selected .option-letter {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--navy);
+  }
+
+  .option-content { flex: 1; }
+  .option-main {
+    font-size: 15px; font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .option-sub {
+    font-size: 12px; font-weight: 400;
+    color: var(--silver);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  /* ── Next button ── */
+  .btn-next {
+    margin-top: 28px;
+    width: 100%;
+    padding: 17px 32px;
+    background: var(--green);
+    color: var(--navy);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .btn-next.visible {
+    opacity: 1;
+    pointer-events: all;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .btn-next:hover {
+    background: var(--greendk);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(46,204,113,0.3);
+  }
+  .btn-next:active { transform: translateY(0); }
+
+  /* ── Result card ── */
+  .result-card {
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .result-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .result-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(32px, 7vw, 52px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .result-subtitle {
+    font-size: 16px; font-weight: 400;
+    color: var(--silver);
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  /* Program detail card */
+  .program-detail {
+    background: var(--navymid);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    border: 1px solid rgba(168,184,200,0.12);
+  }
+  .program-detail-header {
+    padding: 20px 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  .stat-item { }
+  .stat-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--silver);
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: var(--white);
+  }
+
+  .program-detail-body {
+    padding: 0 24px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 4px;
+    padding-top: 16px;
+  }
+
+  .focus-list {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .focus-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: var(--silver);
+    line-height: 1.4;
+  }
+  .focus-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  /* CTA button */
+  .btn-buy {
+    display: block;
+    width: 100%;
+    padding: 20px 32px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 14px;
+  }
+  .btn-buy:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  .btn-retake {
+    display: block; width: 100%;
+    padding: 14px;
+    background: transparent;
+    border: 1px solid rgba(168,184,200,0.25);
+    border-radius: 10px;
+    color: var(--silver);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .btn-retake:hover {
+    border-color: var(--silver);
+    color: var(--white);
+  }
+
+  /* ── Score breakdown ── */
+  .score-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .score-row:last-child { border-bottom: none; }
+  .score-label { color: var(--silver); }
+  .score-val { font-weight: 600; color: var(--white); }
+
+  /* ── Trust strip ── */
+  .trust-strip {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+  .trust-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: var(--silver); font-weight: 500;
+  }
+  .trust-icon { font-size: 16px; }
+
+  /* ── Intro screen ── */
+  .intro-card {
+    animation: slideIn 0.4s ease;
+  }
+  .intro-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 3px; text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 18px;
+  }
+  .intro-heading {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: clamp(36px, 8vw, 58px);
+    font-weight: 900;
+    line-height: 1.05;
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+  }
+  .intro-heading span { color: var(--green); }
+  .intro-body {
+    font-size: 16px; font-weight: 400;
+    color: var(--silver); line-height: 1.65;
+    margin-bottom: 36px;
+    max-width: 520px;
+  }
+  .intro-pills {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 36px;
+  }
+  .pill {
+    padding: 6px 14px;
+    background: var(--navymid);
+    border: 1px solid rgba(168,184,200,0.18);
+    border-radius: 100px;
+    font-size: 12px; font-weight: 600;
+    color: var(--silver);
+    letter-spacing: 0.5px;
+  }
+  .btn-start {
+    display: inline-block;
+    padding: 18px 40px;
+    background: var(--green);
+    color: var(--navy);
+    border: none; border-radius: 10px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 17px; font-weight: 800;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .btn-start:hover {
+    background: var(--greendk);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(46,204,113,0.35);
+  }
+
+  /* Hidden */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="quiz-wrap">
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="brand-bar"></div>
+    <div class="brand-text">Cricket S&amp;C · Program Finder</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       INTRO SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="screen-intro" class="intro-card">
+    <div class="intro-eyebrow">12 Week Offseason Program</div>
+    <h1 class="intro-heading">Find your<br><span>right program</span><br>in 60 seconds.</h1>
+    <p class="intro-body">Answer 5 quick questions about your age, experience and goals. We'll match you to the exact program built for where you're at — then you can purchase and get instant access.</p>
+    <div class="intro-pills">
+      <span class="pill">⚡ 5 questions</span>
+      <span class="pill">🏏 Cricket-specific</span>
+      <span class="pill">3 program levels</span>
+      <span class="pill">Instant access on purchase</span>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">Start the quiz →</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       QUIZ SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="screen-quiz" class="hidden">
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="q-label">Question 1 of 5</span>
+        <span id="q-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Question -->
+    <div id="question-card" class="question-card">
+      <div class="question-num" id="q-num">01 / 05</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="options-list"></div>
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()">
+        Continue →
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       RESULT SCREEN
+  ══════════════════════════════════════════ -->
+  <div id="screen-result" class="hidden result-card">
+    <!-- Dynamically filled by JS -->
+  </div>
+
+</div><!-- /quiz-wrap -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIGURATION — paste your Train Heroic links here
+// ─────────────────────────────────────────────────────────────────────────────
+const PROGRAM_LINKS = {
+  junior:       "https://app.trainheroic.com/YOUR-JUNIOR-PROGRAM-LINK",
+  intermediate: "https://app.trainheroic.com/YOUR-INTERMEDIATE-PROGRAM-LINK",
+  advanced:     "https://app.trainheroic.com/YOUR-ADVANCED-PROGRAM-LINK",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// QUESTIONS — 5 questions, answers stored by index
+// Q0 = age, Q1 = experience, Q2 = barbell, Q3 = equipment, Q4 = cricket level
+// ─────────────────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  {
+    text: "How old are you?",
+    answers: [
+      { text: "Under 14",     sub: "Junior/youth player" },
+      { text: "14 – 16",      sub: "Teenage/representative player" },
+      { text: "17 – 19",      sub: "Senior youth / U19" },
+      { text: "20 or older",  sub: "Senior or adult player" },
+    ]
+  },
+  {
+    text: "How long have you been training in a gym?",
+    answers: [
+      { text: "Never or less than 6 months",  sub: "Just getting started" },
+      { text: "6 months – 1 year",            sub: "Learning the basics" },
+      { text: "1 – 2 years",                  sub: "Getting comfortable with barbell movements" },
+      { text: "3 or more years",              sub: "Experienced and confident in the gym" },
+    ]
+  },
+  {
+    text: "Have you used a barbell before?",
+    answers: [
+      { text: "No — never",                     sub: "I'm not sure how to use one safely" },
+      { text: "A little, but not confidently",  sub: "I've tried squats/deadlifts but need guidance" },
+      { text: "Yes, regularly",                 sub: "I squat, deadlift and bench press with good form" },
+      { text: "Yes — it's my main tool",        sub: "Barbells, trap bar, landmine — all familiar" },
+    ]
+  },
+  {
+    text: "What equipment do you have access to?",
+    answers: [
+      { text: "Very limited",           sub: "Bodyweight, bands or light dumbbells only" },
+      { text: "Dumbbells & machines",   sub: "No barbell, but a decent range of equipment" },
+      { text: "Full commercial gym",    sub: "Barbells, cables, squat rack, sled" },
+      { text: "Full gym + extras",      sub: "Trap bar, landmine, sled and more" },
+    ]
+  },
+  {
+    text: "What best describes your current cricket training?",
+    answers: [
+      { text: "Just starting out",              sub: "I play for fun or at a junior club level" },
+      { text: "Club level, want to improve",    sub: "Training 1–2x a week, want to get more athletic" },
+      { text: "Rep/district level",             sub: "Regular training with a team, serious about S&C" },
+      { text: "Aspiring elite / scholarship",   sub: "High performance pathway or elite junior program" },
+    ]
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROGRAM BASE DEFINITIONS — tagline is generated dynamically from answers
+// ─────────────────────────────────────────────────────────────────────────────
+const PROGRAMS = {
+  junior: {
+    key: "junior",
+    color: "#27AE60",
+    darkColor: "#1E8449",
+    lightColor: "rgba(39,174,96,0.12)",
+    badge: "PROGRAM 1",
+    titleFlat: "Foundation Program",
+    stats: [
+      { label: "Sessions/week", value: "3" },
+      { label: "Duration",      value: "12 weeks" },
+      { label: "Level",         value: "Beginner" },
+    ],
+    focuses: [
+      "Bodyweight & dumbbell movements — no heavy barbell required",
+      "Foundational movement patterns: squat, hinge, push, pull",
+      "Landing mechanics & coordination — injury prevention from day one",
+      "Athletic preparation: pogos, plate hops, wall toss",
+      "Mobility & recovery built into every session",
+    ],
+  },
+  intermediate: {
+    key: "intermediate",
+    color: "#2980B9",
+    darkColor: "#1A5276",
+    lightColor: "rgba(41,128,185,0.12)",
+    badge: "PROGRAM 2",
+    titleFlat: "Intermediate Program",
+    stats: [
+      { label: "Sessions/week", value: "4" },
+      { label: "Duration",      value: "12 weeks" },
+      { label: "Level",         value: "Intermediate" },
+    ],
+    focuses: [
+      "Full barbell program: squats, deadlifts, bench press, hip thrust",
+      "RPE-guided loading: Block 1 RPE 6–7 through to Block 3 RPE 8–9",
+      "Sprint mechanics introduced in Block 2 — A-skips, leaning sprints",
+      "Nordics, split squats & sled work for cricket-specific strength",
+      "4 sessions per week with structured warm-ups and mobility",
+    ],
+  },
+  advanced: {
+    key: "advanced",
+    color: "#8E44AD",
+    darkColor: "#6C3483",
+    lightColor: "rgba(142,68,173,0.12)",
+    badge: "PROGRAM 3",
+    titleFlat: "Advanced Program",
+    stats: [
+      { label: "Sessions/week", value: "4" },
+      { label: "Duration",      value: "12 weeks" },
+      { label: "Level",         value: "Advanced" },
+    ],
+    focuses: [
+      "Maximal strength focus: 2-down 1-up bench, heavy trap bar deadlift",
+      "Depth jumps, plyometrics & resisted sprints from Block 2",
+      "Rotational power at max effort — wall toss, landmine rotation",
+      "Sprint sessions: turn & go, resisted sprints, bounding",
+      "Shoulder health, external rotation & full season-readiness prep",
+    ],
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DYNAMIC TAGLINE — built from what the person actually said
+// ─────────────────────────────────────────────────────────────────────────────
+function buildTagline(answers) {
+  // Age label
+  const ageLabels = ["Under 14", "14–16", "17–19", "20+"];
+  const age = ageLabels[answers[0]] || "";
+
+  // Training age label
+  const expLabels = ["Low training age", "Low training age", "Intermediate training age", "High training age"];
+  const exp = expLabels[answers[1]] || "";
+
+  // Cricket level
+  const cricketLabels = [
+    "Junior club level",
+    "Club level",
+    "Rep / district level",
+    "High performance pathway",
+  ];
+  const cricket = cricketLabels[answers[4]] || "";
+
+  return `${age} · ${exp} · ${cricket}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DECISION LOGIC — age is primary, experience confirms edge cases
+// ─────────────────────────────────────────────────────────────────────────────
+function determineResult(answers) {
+  const age  = answers[0];  // 0=U14, 1=14-16, 2=17-19, 3=20+
+  const exp  = answers[1];  // 0=never/<6m, 1=6m-1yr, 2=1-2yr, 3=3+yr
+  const barb = answers[2];  // 0=never, 1=a little, 2=regularly, 3=main tool
+
+  // Under 14 → always Foundation
+  if (age === 0) return "junior";
+
+  // 17+ (ages 2 or 3) with very low experience → Foundation program
+  // Low training age overrides age when they have never trained
+  if ((age === 2 || age === 3) && exp === 0 && (barb === 0 || barb === 1)) return "junior";
+
+  // 17+ with some experience → Intermediate
+  if ((age === 2 || age === 3) && (exp === 1 || exp === 2) && barb <= 1) return "intermediate";
+
+  // 17+ with solid experience → Advanced
+  if ((age === 2 || age === 3) && (exp >= 2) && barb >= 2) return "advanced";
+
+  // 14–16 with 3+ years AND confident barbell → Advanced
+  if (age === 1 && exp === 3 && barb >= 2) return "advanced";
+
+  // 14–16 default → Intermediate
+  if (age === 1) return "intermediate";
+
+  return "intermediate";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let currentQ  = 0;
+let answers   = [];
+let selected  = null;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// QUIZ FLOW
+// ─────────────────────────────────────────────────────────────────────────────
+function startQuiz() {
+  document.getElementById("screen-intro").classList.add("hidden");
+  document.getElementById("screen-quiz").classList.remove("hidden");
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  selected = null;
+
+  const pct = Math.round((currentQ / QUESTIONS.length) * 100);
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("q-label").textContent = `Question ${currentQ + 1} of ${QUESTIONS.length}`;
+  document.getElementById("q-pct").textContent = pct + "%";
+  document.getElementById("q-num").textContent =
+    String(currentQ + 1).padStart(2, "0") + " / " +
+    String(QUESTIONS.length).padStart(2, "0");
+  document.getElementById("q-text").textContent = q.text;
+
+  const list = document.getElementById("options-list");
+  list.innerHTML = "";
+  const letters = ["A", "B", "C", "D"];
+  q.answers.forEach((ans, i) => {
+    const div = document.createElement("div");
+    div.className = "option";
+    div.innerHTML = `
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-content">
+        <div class="option-main">${ans.text}</div>
+        ${ans.sub ? `<div class="option-sub">${ans.sub}</div>` : ""}
+      </div>`;
+    div.onclick = () => selectAnswer(i, div);
+    list.appendChild(div);
+  });
+
+  const btn = document.getElementById("btn-next");
+  btn.classList.remove("visible");
+
+  const card = document.getElementById("question-card");
+  card.style.animation = "none";
+  requestAnimationFrame(() => {
+    card.style.animation = "slideIn 0.4s cubic-bezier(0.4,0,0.2,1)";
+  });
+}
+
+function selectAnswer(idx, el) {
+  document.querySelectorAll(".option").forEach(o => o.classList.remove("selected"));
+  el.classList.add("selected");
+  selected = idx;
+  document.getElementById("btn-next").classList.add("visible");
+}
+
+function nextQuestion() {
+  if (selected === null) return;
+  answers[currentQ] = selected;
+  currentQ++;
+  if (currentQ < QUESTIONS.length) {
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById("progress-fill").style.width = "100%";
+  document.getElementById("q-label").textContent = "Complete!";
+  document.getElementById("q-pct").textContent = "100%";
+
+  const result  = determineResult(answers);
+  const prog    = PROGRAMS[result];
+  const tagline = buildTagline(answers);
+
+  setTimeout(() => {
+    document.getElementById("screen-quiz").classList.add("hidden");
+    const resultDiv = document.getElementById("screen-result");
+    resultDiv.classList.remove("hidden");
+
+    resultDiv.innerHTML = `
+      <div class="result-badge" style="background:${prog.lightColor};color:${prog.color}">
+        ✓ YOUR MATCH &nbsp;·&nbsp; ${prog.badge}
+      </div>
+
+      <h2 class="result-title" style="color:${prog.color}">${prog.titleFlat}</h2>
+      <p class="result-subtitle">${tagline}</p>
+
+      <div class="program-detail" style="border-color:${prog.color}33">
+        <div class="program-detail-header" style="border-bottom:2px solid ${prog.color}">
+          ${prog.stats.map(s => `
+            <div class="stat-item">
+              <div class="stat-label">${s.label}</div>
+              <div class="stat-value" style="color:${prog.color}">${s.value}</div>
+            </div>`).join("")}
+        </div>
+        <div class="program-detail-body">
+          <div class="stat-label" style="margin-bottom:12px">What's included</div>
+          <div class="focus-list">
+            ${prog.focuses.map(f => `
+              <div class="focus-item">
+                <div class="focus-dot" style="background:${prog.color}"></div>
+                <span>${f}</span>
+              </div>`).join("")}
+          </div>
+        </div>
+      </div>
+
+      <a href="${PROGRAM_LINKS[result]}" target="_blank" class="btn-buy"
+         style="background:${prog.color};color:#0D1B2A">
+        Get Instant Access — Buy Now →
+      </a>
+
+      <button class="btn-retake" onclick="retakeQuiz()">Retake the quiz</button>
+
+      <div class="trust-strip">
+        <div class="trust-item"><span class="trust-icon">🔒</span> Secure payment via Train Heroic</div>
+        <div class="trust-item"><span class="trust-icon">⚡</span> Instant program access on purchase</div>
+        <div class="trust-item"><span class="trust-icon">💬</span> Coach messaging included</div>
+      </div>
+    `;
+  }, 200);
+}
+
+function retakeQuiz() {
+  currentQ = 0;
+  answers  = [];
+  selected = null;
+
+  document.getElementById("screen-result").classList.add("hidden");
+  document.getElementById("screen-quiz").classList.remove("hidden");
+  document.getElementById("progress-fill").style.width = "0%";
+  renderQuestion();
+}
+</script>
+
+</body>
+</html>
